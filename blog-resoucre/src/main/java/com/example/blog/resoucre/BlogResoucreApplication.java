@@ -1,0 +1,15 @@
+package com.example.blog.resoucre;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class BlogResoucreApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BlogResoucreApplication.class, args);
+    }
+
+}

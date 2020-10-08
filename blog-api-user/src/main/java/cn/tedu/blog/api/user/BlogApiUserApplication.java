@@ -1,11 +1,9 @@
-package cn.tedu.blog.gateway;
+package cn.tedu.blog.api.user;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,13 +14,11 @@ import java.io.Serializable;
 
 @SpringBootApplication
 @EnableEurekaServer
-@EnableZuulProxy
-@ServletComponentScan
-@MapperScan("cn.tedu.blog.gateway.mapper")
-public class BlogGatewayApplication {
+@MapperScan("cn.tedu.blog.api.user.mapper")
+public class BlogApiUserApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BlogGatewayApplication.class, args);
+        SpringApplication.run(BlogApiUserApplication.class, args);
     }
 
     @Bean
