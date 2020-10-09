@@ -1,12 +1,10 @@
 package cn.tedu.blog.api.blog.controller;
 
-import cn.tedu.blog.common.exception.elasticSearch.ElasticsearchNoMoreException;
+import cn.tedu.blog.common.exception.elasticSearch.ElasticsearchNoFindException;
 import cn.tedu.blog.common.exception.elasticSearch.MyElasticsearchException;
 import cn.tedu.blog.common.util.R;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.io.IOException;
 
 /**
  * @author Mr.Zhou
@@ -20,8 +18,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({MyElasticsearchException.class})
     public R handleException(Throwable e) {
-        if (e instanceof ElasticsearchNoMoreException) {
-            return R.failure(R.State.ERR_ES_NO_MORE, e);
+        if (e instanceof ElasticsearchNoFindException) {
+            return R.failure(R.State.ERR_ES_NO_Find, e);
         } else {
             return R.failure(R.State.ERR_UNKNOWN, e);
         }

@@ -8,5 +8,9 @@ package cn.tedu.blog.common.constant;
  * @date 2020/10/7 19:35
  */
 public interface ESConstant {
-  String BLOG_CONTENT_INDEX="blog_content_index";
+    //  ik分词器
+    String analyzer = "ik_smart";
+
+    //博客文章的下下标
+    String BLOG_CONTENT_INDEX = "blog_content_index";
 }

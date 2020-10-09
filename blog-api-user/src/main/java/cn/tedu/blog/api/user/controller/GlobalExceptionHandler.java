@@ -1,7 +1,5 @@
 package cn.tedu.blog.api.user.controller;
 
-import cn.tedu.blog.common.exception.elasticSearch.ElasticsearchNoMoreException;
-import cn.tedu.blog.common.exception.elasticSearch.MyElasticsearchException;
 import cn.tedu.blog.common.exception.weChatApp.WeChatAppException;
 import cn.tedu.blog.common.exception.weChatApp.WeChatLoginSessionException;
 import cn.tedu.blog.common.util.R;

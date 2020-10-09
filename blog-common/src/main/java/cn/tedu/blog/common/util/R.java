@@ -66,7 +66,7 @@ public class R<T> implements Serializable {
         /**
          *
          */
-        Integer ERR_BLOG_NO_BIND=2500;
+        Integer ERR_BLOG_NO_BIND = 2500;
         /**
          * 3000-4000
          * 微信app的异常
@@ -75,7 +75,12 @@ public class R<T> implements Serializable {
         /**
          * 4000-5000 ElasticSearch的异常
          */
-        Integer ERR_ES_NO_MORE = 4020;
-
+        //无结果
+        Integer ERR_ES_NO_Find = 4404;
+        /**
+         * 5000-6000 博客的异常
+         */
+        //添加博客失败
+        Integer ERR_BLOG_INSERT_EXCEPTION = 5555;
     }
 }

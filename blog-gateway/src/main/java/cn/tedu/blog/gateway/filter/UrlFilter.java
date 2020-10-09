@@ -1,6 +1,6 @@
 package cn.tedu.blog.gateway.filter;
 
-import cn.tedu.blog.common.util.SessionUtil;
+import cn.tedu.blog.common.util.ServletUtils;
 import cn.tedu.blog.gateway.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.io.IOException;
  * @date 2020/10/8 5:47
  */
 //@WebFilter(urlPatterns = {"/api-blog/v1/**","/api-blog/v1/**"})
-@WebFilter(urlPatterns = "/api-blog/v1/*")
+@WebFilter(urlPatterns = {"/api-blog/v1/*","/upload/*"})
 @Slf4j
 public class UrlFilter implements Filter {
 
@@ -28,7 +28,6 @@ public class UrlFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("555555555555555555555555");
     }
 
     @Override
@@ -38,10 +37,11 @@ public class UrlFilter implements Filter {
         resp.setHeader("Access-Control-Allow-Origin", "*");
 
         //获取请求时的sessionId
-        String sessionId = SessionUtil.getSessionId((HttpServletRequest) request);
+
+        String sessionId = ServletUtils.getCookie();
         log.info("sessionId:{}", sessionId);
         //只有在缓存中存在该sessionId才能进行请求
-        if (!redisUtils.hasKey(sessionId)) {
+        if (sessionId==null||!redisUtils.hasKey(sessionId)) {
             // 登录信息已过期，请重新登录
             log.info("sessionId过滤{}", "登录信息失效，请重新登录");
             response.getWriter().write("401");

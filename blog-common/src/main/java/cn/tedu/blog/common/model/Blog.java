@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -20,6 +21,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("blog")
+@Accessors(chain = true)
 public class Blog implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -38,12 +40,6 @@ public class Blog implements Serializable {
      */
     @TableField("blog_sub_title")
     private String blogSubTitle;
-
-    /**
-     * 文章作者
-     */
-    @TableField("blog_author")
-    private String blogAuthor;
 
     /**
      * 文章内容，支持HTML格式
@@ -69,10 +65,10 @@ public class Blog implements Serializable {
     @TableField("blog_state")
     private Integer blogState;
     /**
-     * 用户id
+     * 用户openid
      */
-    @TableField("user_id")
-    private Long userId;
+    @TableField("user_open_id")
+    private String userOpenId;
 
     /**
      * 文章发表时间

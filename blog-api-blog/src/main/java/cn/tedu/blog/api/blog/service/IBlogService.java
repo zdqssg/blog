@@ -1,10 +1,13 @@
 package cn.tedu.blog.api.blog.service;
 
+import cn.tedu.blog.api.blog.dto.BlogDto;
 import cn.tedu.blog.common.model.Blog;
 import cn.tedu.blog.common.util.R;
+import cn.tedu.blog.common.vo.blog.BlogInfoVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +19,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface IBlogService extends IService<Blog> {
 
-    R getIndexBlog(Integer pageNum, HttpServletRequest request);
+
+    R getIndexBlogByMySql(Integer pageNum );
+
+
+    R postBlog(BlogDto blogDto );
+
+    R getBlogDetail(Integer id);
 }

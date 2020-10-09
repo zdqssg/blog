@@ -4,16 +4,47 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.tedu.blog.common.model.Blog">
-        <id column="id" property="id" />
-        <result column="blog_title" property="blogTitle" />
-        <result column="blog_sub_title" property="blogSubTitle" />
-        <result column="blog_author" property="blogAuthor" />
-        <result column="blog_content" property="blogContent" />
-        <result column="blog_view_times" property="blogViewTimes" />
-        <result column="blog_label" property="blogLabel" />
-        <result column="user_id" property="userId" />
-        <result column="blog_post_time" property="blogPostTime" />
-        <result column="blog_update_time" property="blogUpdateTime" />
+        <id column="id" property="id"/>
+        <result column="blog_title" property="blogTitle"/>
+        <result column="blog_sub_title" property="blogSubTitle"/>
+        <result column="blog_content" property="blogContent"/>
+        <result column="blog_view_times" property="blogViewTimes"/>
+        <result column="blog_label" property="blogLabel"/>
+        <result column="blog_state" property="blogState"/>
+        <result column="user_open_id" property="userOpenId"/>
+        <result column="blog_post_time" property="blogPostTime"/>
+        <result column="blog_update_time" property="blogUpdateTime"/>
     </resultMap>
+    <resultMap id="BlogInfoVoResultMap" type="cn.tedu.blog.common.vo.blog.BlogInfoVo">
+        <id column="id" property="id"/>
+        <result column="user_open_id" property="userOpenId"/>
+        <result column="nickName" property="nickName"/>
+        <result column="avatarUrl" property="avatarUrl"/>
+        <result column="blog_title" property="blogTitle"/>
+        <result column="blog_sub_title" property="blogSubTitle"/>
+        <result column="blog_content" property="blogContent"/>
+        <result column="blog_view_times" property="blogViewTimes"/>
+        <result column="blog_label" property="blogLabel"/>
+        <result column="blog_state" property="blogState"/>
+        <result column="blog_post_time" property="blogPostTime"/>
+    </resultMap>
+    <select id="selectIndexBlog" resultMap="BlogInfoVoResultMap">
+            SELECT b.id,b.blog_title,b.blog_sub_title,b.blog_content,b.blog_view_times,b.blog_label,b.blog_state,b.user_open_id,b.blog_post_time,
+                   u.nickName,u.avatarUrl
+            FROM blog b
+            LEFT JOIN user u
+                on b.user_open_id = u.user_open_id
+            WHERE b.blog_state=1
+            ORDER BY b.blog_post_time DESC
+    </select>
+    <select id="getBlogDetail" parameterType="java.lang.Integer"
+            resultMap="BlogInfoVoResultMap">
+            SELECT b.id,b.blog_title,b.blog_sub_title,b.blog_content,b.blog_view_times,b.blog_label,b.blog_state,b.user_open_id,b.blog_post_time,
+                   u.nickName,u.avatarUrl
+            FROM blog b
+            LEFT JOIN user u
+                on b.user_open_id = u.user_open_id
+            WHERE b.id=#{id}
+    </select>
 
 </mapper>

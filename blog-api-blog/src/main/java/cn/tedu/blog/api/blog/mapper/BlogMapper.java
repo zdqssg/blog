@@ -1,8 +1,11 @@
 package cn.tedu.blog.api.blog.mapper;
 
 import cn.tedu.blog.common.model.Blog;
+import cn.tedu.blog.common.vo.blog.BlogInfoVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>
@@ -14,5 +17,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BlogMapper extends BaseMapper<Blog> {
+    /**
+     * 获取博客文章列表
+     * @return
+     */
+    List<BlogInfoVo> selectIndexBlog();
 
+    BlogInfoVo getBlogDetail(Integer id);
 }

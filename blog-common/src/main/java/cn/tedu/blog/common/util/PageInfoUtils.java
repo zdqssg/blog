@@ -44,7 +44,7 @@ public class PageInfoUtils {
         //封装
         PageInfo<T> page = new PageInfo<>();
         page.setList(list);
-        page.setPageNum(pageNum);
+        page.setPageNum(pageNum/pageSize);
         page.setPageSize(pageSize);
         page.setTotal(total);
         page.setPages(total == 0 ? 0 : (total % pageSize == 0 ? total / pageSize : (total / pageSize) + 1));

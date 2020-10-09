@@ -1,6 +1,7 @@
 package cn.tedu.blog.api.blog.utils;
 
 
+import cn.tedu.blog.common.util.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
@@ -8,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.List;
 
@@ -149,5 +151,16 @@ public class RedisUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 得到sessionId
+     * @return
+     * @throws Exception
+     */
+    public  String redisGetOpenId() throws Exception {
+        String sessionId = ServletUtils.getCookie();
+
+        return (String) getHash(sessionId,"sessionId");
     }
 }

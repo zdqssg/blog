@@ -20,6 +20,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -40,8 +42,9 @@ public class BlogSchedule {
     private BlogMapper blogMapper;
 
 
-    @Scheduled(fixedRate = 1000 * 60 * 60 * 24 )
+    @Scheduled(fixedRate = 1000 * 60 * 5 )
     private void addBlog() {
+        log.debug("[{}]准备更新BLOG", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()));
         //删除ElasticSearch的索引
         DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(ESConstant.BLOG_CONTENT_INDEX);
         try {
@@ -77,6 +80,6 @@ public class BlogSchedule {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        log.debug("[{}]HAOLE BLOG", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()));
     }
 }

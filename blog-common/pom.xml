@@ -13,6 +13,10 @@
     <name>blog-common</name>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.tedu</groupId>
+            <artifactId>blog-common</artifactId>
+        </dependency>
         <!-- spring-boot-starter-web-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -3,11 +3,11 @@ package cn.tedu.blog.common.model;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -19,9 +19,8 @@ import lombok.experimental.Accessors;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("user")
-@Accessors(chain = true)
-public class User implements Serializable {
+@TableName("user_focus_blog")
+public class UserFocusBlog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,40 +34,28 @@ public class User implements Serializable {
     private String userOpenId;
 
     /**
-     * 用户昵称
+     * 博客Id
      */
-    @TableField("nickName")
-    private String nickName;
+    @TableField("blog_id")
+    private Long blogId;
 
     /**
-     * 性别  0女  1男
+     * 关注状态   0未关注  1已关注
      */
-    @TableField("gender")
-    private Integer gender;
+    @TableField("is_focus")
+    private Integer isFocus;
 
     /**
-     * 城市
+     * 创立时间
      */
-    @TableField("city")
-    private String city;
+    @TableField("post_time")
+    private LocalDateTime postTime;
 
     /**
-     * 省
+     * 修改时间
      */
-    @TableField("province")
-    private String province;
-
-    /**
-     * 用户国家
-     */
-    @TableField("country")
-    private String country;
-
-    /**
-     * 微信头像
-     */
-    @TableField("avatarUrl")
-    private String avatarUrl;
+    @TableField("update_time")
+    private LocalDateTime updateTime;
 
 
 }

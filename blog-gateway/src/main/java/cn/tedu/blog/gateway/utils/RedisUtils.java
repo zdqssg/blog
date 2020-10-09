@@ -1,6 +1,7 @@
 package cn.tedu.blog.gateway.utils;
 
 
+import cn.tedu.blog.common.util.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
@@ -87,11 +88,15 @@ public class RedisUtils {
      * @param key
      * @param hashKey
      */
-    public Object getHash(String key, String hashKey) {
+    public Object getHash(String key, String hashKey) throws Exception {
         HashOperations<String, String, Object> hash = redisTemplate.opsForHash();
-        return hash.get(key, hashKey);
-    }
 
+        try {
+            return hash.get(key, hashKey);
+        } catch (Exception e) {
+            throw new Exception();
+        }
+    }
     /**
      * 向Redis中的某个List添加集合元素
      *
@@ -144,4 +149,15 @@ public class RedisUtils {
             return false;
         }
     }
+    /**
+     * 得到sessionId
+     * @return
+     * @throws Exception
+     */
+    public  String redisGetOpenId() throws Exception {
+        String sessionId = ServletUtils.getCookie();
+
+        return (String) getHash(sessionId,"sessionId");
+    }
+
 }

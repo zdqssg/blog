@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +50,7 @@ public class UserLoginByWeChatController {
     private RedisUtils redisUtils;
 
     @PostMapping("/byWeixin")
-    public R loginByWeixin(@RequestBody Code code) {
+    public R loginByWeixin(@RequestBody Code code, HttpServletRequest request) {
         //得到用户的openId + sessionKey
         JSONObject jsonObject = null;
         try {
@@ -66,10 +67,10 @@ public class UserLoginByWeChatController {
         Map<String,Object> resMap = new HashMap<String,Object>();
         //判断openId是否存在用户表中
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("openId",openId);
+        queryWrapper.eq("user_open_id",openId);
         User one = userService.getOne(queryWrapper);
         if(one==null){
-            userService.save(new User().setOpenId(openId));
+            userService.save(new User().setUserOpenId(openId));
         }
 
         //将通过md5生成sessionId（一般是用个操作系统提供的真正随机数算法生成新的session）

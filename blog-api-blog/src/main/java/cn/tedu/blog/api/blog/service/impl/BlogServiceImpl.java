@@ -1,37 +1,30 @@
 package cn.tedu.blog.api.blog.service.impl;
 
+
+import cn.tedu.blog.api.blog.dto.BlogDto;
 import cn.tedu.blog.api.blog.mapper.BlogMapper;
+import cn.tedu.blog.api.blog.mapper.UserFocusBlogMapper;
 import cn.tedu.blog.api.blog.service.IBlogService;
-import cn.tedu.blog.api.blog.utils.RedisSessionUtil;
-import cn.tedu.blog.common.constant.ESConstant;
-import cn.tedu.blog.common.exception.elasticSearch.ElasticsearchNoMoreException;
+import cn.tedu.blog.api.blog.utils.RedisUtils;
+import cn.tedu.blog.common.exception.service.BlogInsetException;
 import cn.tedu.blog.common.model.Blog;
-import cn.tedu.blog.common.util.PageInfoUtils;
+import cn.tedu.blog.common.model.UserFocusBlog;
 import cn.tedu.blog.common.util.R;
+import cn.tedu.blog.common.vo.blog.BlogInfoVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -48,59 +41,88 @@ public class BlogServiceImpl<T> extends ServiceImpl<BlogMapper, Blog> implements
     @Value("${project.blog-index.pageSize}")
     private Integer pageSize;
     @Autowired
-    @Qualifier("restHighLevelClient")
-    private RestHighLevelClient client;
+    private RedisUtils redisUtils;
     @Autowired
-    private RedisSessionUtil redisSessionUtil;
+    private BlogMapper blogMapper;
+    @Autowired
+    private UserFocusBlogMapper focusBlogMapper;
 
+
+    //    mysql的实现
     @Override
-    public R getIndexBlog(Integer pageNum, HttpServletRequest request) {
+    public R getIndexBlogByMySql(Integer pageNum) {
         log.debug("请求第{}页数据", pageNum);
-        if (pageNum == null || pageNum < 0) {
-            pageNum = 0;
+        if (pageNum == null || pageNum < 1) {
+            pageNum = 1;
         }
-        pageNum = pageSize * pageNum;
+        String openId = null;
         try {
-            String openId = redisSessionUtil.redisGetOpenId(request);
+            openId = redisUtils.redisGetOpenId();
         } catch (Exception e) {
-            e.printStackTrace();
         }
+        PageHelper.startPage(pageNum, pageSize);
+        List<BlogInfoVo> blogInfoVoList = blogMapper.selectIndexBlog();
 
-        // SearchSourceBuilder 条件构造
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        FieldSortBuilder sortBuilder = SortBuilders.fieldSort("blogPostTime").order(SortOrder.DESC);
-
-        sourceBuilder
-                .sort(sortBuilder)
-                .from(pageNum)
-                .size(pageSize)
-                .timeout(new TimeValue(60, TimeUnit.SECONDS));
-
-        //索引
-        SearchRequest indexRequest = new SearchRequest(ESConstant.BLOG_CONTENT_INDEX);
-        indexRequest.source(sourceBuilder);
-
-        SearchResponse searchResponse = null;
-        //执行搜索
-        try {
-            searchResponse = client.search(indexRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            log.debug("异常{}", e.getMessage());
+        //组装数据
+        QueryWrapper<UserFocusBlog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_open_id", openId)
+                .eq("is_focus", 1);
+        List<UserFocusBlog> focusBlogList = focusBlogMapper.selectList(queryWrapper);
+        if (focusBlogList.size() != 0) {
+            for (UserFocusBlog focusBlog : focusBlogList) {
+                for (int i = 0; i < blogInfoVoList.size(); i++) {
+                    if (blogInfoVoList.get(i).getId().equals(focusBlog.getBlogId())) {
+                        blogInfoVoList.get(i).setIsFocus(1);
+                    }
+                }
+            }
         }
+        log.debug("博客列表的详细信息{}", blogInfoVoList);
+        PageInfo<BlogInfoVo> pageInfo = new PageInfo<>(blogInfoVoList);
 
-        SearchHits hits = searchResponse.getHits();
-//        System.out.println(hits);
-        List<T> list = new ArrayList<>();
-        for (SearchHit documentFields : hits.getHits()) {
-            list.add((T) documentFields.getSourceAsMap());
-        }
-        log.debug("搜索内容{}", list);
-        //
-        if (list.size() == 0) {
-            throw new ElasticsearchNoMoreException("没有更多了");
-        }
-        int total = (int) hits.getTotalHits().value;
-        PageInfo<T> pageInfo = PageInfoUtils.esToPageInfo(list, pageNum, pageSize, total);
         return R.ok(pageInfo);
     }
+
+    @Override
+    public R postBlog(BlogDto blogDto) {
+        log.debug("文章内容{}",blogDto);
+        String openId = null;
+        try {
+            openId = redisUtils.redisGetOpenId();
+        } catch (Exception e) {
+        }
+        Blog blog = new Blog()
+                .setBlogTitle(blogDto.getTitle())
+                .setBlogContent(blogDto.getContent())
+                .setBlogViewTimes(0)
+                .setBlogState(1)
+                .setUserOpenId(openId)
+                .setBlogPostTime(LocalDateTime.now())
+                .setBlogUpdateTime(LocalDateTime.now());
+        int insert = blogMapper.insert(blog);
+        if (insert==1){
+            return R.ok(blog.getId());
+        }else {
+            return R.failure(R.State.ERR_BLOG_INSERT_EXCEPTION,new BlogInsetException("系统异常"));
+        }
+
+    }
+
+    @Override
+    public R getBlogDetail(Integer id) {
+
+        BlogInfoVo blogInfoVo=  blogMapper.getBlogDetail(id);
+        Long blogId = blogInfoVo.getId();
+        Integer viewTimes = blogInfoVo.getBlogViewTimes();
+
+        UpdateWrapper<Blog> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id",blogId);
+        blogMapper.update(new Blog().setBlogViewTimes(++viewTimes),updateWrapper);
+
+
+        blogInfoVo.setBlogViewTimes(viewTimes);
+        return R.ok(blogInfoVo);
+    }
+
+
 }
